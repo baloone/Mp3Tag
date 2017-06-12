@@ -63,7 +63,7 @@
                 track: true
             })
             parser.read(function (dict) {
-                console.log (dict)
+                window.rev
                 album.innerText = !!dict.album ? dict.album.text : "Unknown album"
                 title.innerText = !!dict.title ? dict.title.text : "Unknown title"
                 year.innerText = !!dict.year ? dict.year.text : "Unknown year"
@@ -71,6 +71,7 @@
                 genre.innerText = !!dict.genre ? dict.genre.text : "Unknown genre"
                 artist.innerText = !!dict.artist ? dict.artist.text : "Unknown artist"
                 img.src = !!dict.picture ? window.URL.createObjectURL(dict.picture.blob) : "1280x960.png"
+                audio.src = window.URL.createObjectURL(file)
             })
         })
 </script>
