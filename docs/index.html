@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>FastId3 lib test</title>
+    <link rel="stylesheet" href="bulma.css">
+</head>
+<body>
+    <section class="section">
+        <div class="container" style="text-align: center">
+            <input type="file" id="input" style="display:none">
+            <div class="button is-primary" onclick="this.parentElement.children[0].click()">Upload some song</div>
+        </div>
+    </section>
+    <section class="section">
+        <div class="container" style="text-align: center">
+            <div class="card" style="max-width: 400px; margin: auto">
+            <div class="card-image">
+                <figure class="image">
+                <img src="1280x960.png" id="img" alt="Image">
+                </figure>
+            </div>
+            <div class="card-content columns">
+                <div class="media-content column">
+                    <p class="title is-4" id="title">Song Title</p>
+                    <p class="subtitle is-6" id="album">Album</p>
+                    <p class="subtitle is-6" style="margin-top: -1.5em" id="track">Track</p>
+                </div>
+                <div class="media-content column" style="text-align: right">
+                    <p class="title is-4" id="artist">Artist</p>
+                    <p class="subtitle is-6" id="year">Year</p>
+                    <p class="subtitle is-6" style="margin-top: -1.5em" id="genre">Genre</p>
+                </div>
+            </div>
+            <footer class="card-footer"><audio src="" controls style="width:100%" id="audio"></audio></footer>
+        </div>
+    </section>
+    <div id="div"></div>
+    <img src="" >
+</body>
+<script src="FID3.min.js"></script>
+<script>
+    var fileIn = document.querySelector ("#input")
+    var img = document.querySelector ("#img")
+    var artist = document.querySelector ("#artist")
+    var album = document.querySelector ("#album")
+    var title = document.querySelector ("#title")
+    var track = document.querySelector ("#track")
+    var genre = document.querySelector ("#genre")
+    var year = document.querySelector ("#year")
+    var audio = document.querySelector ("#audio")
+    fileIn.addEventListener("change", function(e) {
+            var file = e.target.files[0]
+            var parser = new FID3(file, {
+                picture: true,
+                album: true,
+                artist: true,
+                title: true,
+                year: true,
+                genre: true,
+                track: true
+            })
+            parser.read(function (dict) {
+                console.log (dict)
+                album.innerText = !!dict.album ? dict.album.text : "Unknown album"
+                title.innerText = !!dict.title ? dict.title.text : "Unknown title"
+                year.innerText = !!dict.year ? dict.year.text : "Unknown year"
+                track.innerText = !!dict.track ? dict.track.text : "Unknown track"
+                genre.innerText = !!dict.genre ? dict.genre.text : "Unknown genre"
+                artist.innerText = !!dict.artist ? dict.artist.text : "Unknown artist"
+                img.src = !!dict.picture ? window.URL.createObjectURL(dict.picture.blob) : "1280x960.png"
+            })
+        })
+</script>
+</html>
