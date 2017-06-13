@@ -41,7 +41,6 @@
       for (; arr[off] !== 0; off++);
       var mime = String.fromCharCode.apply(null, arr.slice(1, off))
       off++ // $00
-      off++ // Picture Type
       for (; arr[off] !== 0; off++);
       for (; arr[off] === 0; off++);
       return {
