@@ -128,7 +128,6 @@
       genre: ['TCON', 'TCO']
     }
     getMeta(file, function (res, buf){
-      console.log (res)
       var dict = {}
       for (var opt in options) {
         if (options[opt]) {
