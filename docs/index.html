@@ -51,7 +51,7 @@
     <div id="div"></div>
     <img src="" >
 </body>
-<script src="FID3.min.js"></script>
+<script src="FID3.js"></script>
 <script>
     var fileIn = document.querySelector ("#input")
     var img = document.querySelector ("#img")
@@ -76,7 +76,7 @@
             })
             var t1 = Date.now()
             parser.read(function (dict) {
-                window.rev
+                console.log (dict)
                 album.innerText = !!dict.album ? dict.album.text : "Unknown album"
                 title.innerText = !!dict.title ? dict.title.text : "Unknown title"
                 year.innerText = !!dict.year ? dict.year.text : "Unknown year"

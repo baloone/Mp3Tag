@@ -40,9 +40,12 @@
       var off = 1
       for (; arr[off] !== 0; off++);
       var mime = String.fromCharCode.apply(null, arr.slice(1, off))
+      off++ // $00
+      off++ // Picture Type
+      for (; arr[off] !== 0; off++);
       for (; arr[off] === 0; off++);
       return {
-        blob: file.slice(pos + off, pos + size),
+        blob: new Blob([buffer.slice(pos + off, pos + size)], {type:mime}),
         mime:mime
       }
     },
@@ -52,7 +55,7 @@
       var encoding = ui8a[0]
       var encToStr = function (enc) {
         if (enc === 0) return 'ISO-8859-1'
-        else if (enc === 1) return 'UCS-2'
+        else if (enc === 1) return 'UTF-16'
         else if (enc === 2) return 'UTF-16BE'
         else if (enc === 3) return 'UTF-8'
         return ''
@@ -121,10 +124,11 @@
       artist: ['TP1', 'TPE1'],
       title: ['TIT2', 'TT2'],
       year: ['TYER', 'TYE', 'TDRC'],
-      track: ['TRCK', 'TPOS', 'TRK'],
+      track: ['TRCK', 'TRK'],
       genre: ['TCON', 'TCO']
     }
     getMeta(file, function (res, buf){
+      console.log (res)
       var dict = {}
       for (var opt in options) {
         if (options[opt]) {
