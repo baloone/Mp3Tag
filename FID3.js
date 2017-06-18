@@ -40,7 +40,7 @@
       var off = 1
       for (; arr[off] !== 0; off++);
       var mime = String.fromCharCode.apply(null, arr.slice(1, off))
-      off++ // $00
+      for (var i = 0; arr[off] === 0 && i < 2; off++,i++);
       for (; arr[off] !== 0; off++);
       for (; arr[off] === 0; off++);
       return {
