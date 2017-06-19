@@ -52,16 +52,10 @@
       if (siz < 1) return { text: null }
       var ui8a = new Uint8Array(buffer.slice(beg, beg + siz))
       var encoding = ui8a[0]
-      var encToStr = function (enc) {
-        if (enc === 0) return 'ISO-8859-1'
-        else if (enc === 1) return 'UTF-16'
-        else if (enc === 2) return 'UTF-16BE'
-        else if (enc === 3) return 'UTF-8'
-        return ''
-      }
+      var encToStr = ['ISO-8859-1', 'UTF-16', 'UTF-16BE','UTF-8']
       ui8a = ui8a.slice(1)
       return {
-        text: new TextDecoder(encToStr(encoding)).decode(ui8a).replace('\0', '')
+        text: new TextDecoder(encToStr[encoding]).decode(ui8a).replace('\0', '')
       }
     },
     album: function (file, buffer, tag) {
