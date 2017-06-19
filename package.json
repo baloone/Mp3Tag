@@ -1,0 +1,30 @@
+{
+  "name": "fid3",
+  "version": "0.1.0",
+  "description": "A fast id3 tags reader written in js",
+  "main": "FID3.js",
+  "dependencies": {},
+  "devDependencies": {
+    "grunt": "^1.0.1",
+    "grunt-contrib-uglify": "^3.0.1",
+    "grunt-contrib-watch": "^1.0.0"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/MohIceAge/FastId3Reader.git"
+  },
+  "keywords": [
+    "id3",
+    "fast",
+    "mp3",
+    "parser",
+    "reader",
+    "id3v2 "
+  ],
+  "author": "fast",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/MohIceAge/FastId3Reader/issues"
+  },
+  "homepage": "https://github.com/MohIceAge/FastId3Reader#readme"
+}

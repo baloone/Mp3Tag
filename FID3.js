@@ -152,7 +152,7 @@
     }
   }
   try {
-    global.FID3 = FID3
+    module.exports.FID3 = FID3
   } catch (e) {
     window.FID3 = FID3
   }
