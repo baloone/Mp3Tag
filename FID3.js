@@ -158,9 +158,5 @@
       getId3(this.file, this.options, callback)
     }
   }
-  try {
-    module.exports.FID3 = FID3
-  } catch (e) {
-    window.FID3 = FID3
-  }
+  window.FID3 = FID3
 })()
