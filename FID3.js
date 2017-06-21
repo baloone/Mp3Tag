@@ -88,13 +88,12 @@
         })
     }
   }
-  var getMeta = function (file, callback, fail) {
-    if (fail == null) fail = console.error
+  var getMeta = function (file, callback) {
     var fileReader = new FileReader()
     fileReader.onload = function(e) {
       var buf = e.target.result
       var ui8a = new Uint8Array(buf)
-      if(String.fromCharCode.apply(null, ui8a.slice(0,3)) !== 'ID3') return fail('NOT ID3')
+      if(String.fromCharCode.apply(null, ui8a.slice(0,3)) !== 'ID3') return callback([])
       var cl = function (off, a) {
       if (a == null) a = []
         readTagAt(off, file, function(tag){
