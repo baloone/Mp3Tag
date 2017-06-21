@@ -94,20 +94,21 @@
     fileReader.onload = function(e) {
       var buf = e.target.result
       var ui8a = new Uint8Array(buf)
+      if(String.fromCharCode.apply(null, ui8a.slice(0,3)) !== 'ID3') return fail('NOT ID3')
+      var cl = function (off, a) {
+      if (a == null) a = []
+        readTagAt(off, file, function(tag){
+          if (!tag.nothing) {
+            a.push(tag)
+            cl(tag.position + tag.size, a)
+          } else {
+            callback(a)
+          }
+        })
+      }
+      cl(10)
     }
     fileReader.readAsArrayBuffer(file.slice(0,10))
-    var cl = function (off, a) {
-      if (a == null) a = []
-      readTagAt(off, file, function(tag){
-        if (!tag.nothing) {
-          a.push(tag)
-          cl(tag.position + tag.size, a)
-        } else {
-          callback(a)
-        }
-      })
-    }
-    cl(10)
   }
 
   var getId3 = function (file, opts, callback) {
