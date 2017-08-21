@@ -9,10 +9,9 @@ const map = {
 };
 
 module.exports = function(header, frames) {
-    const ret = {frames: {}};
+    const ret = {frames};
 
     for (const frame of frames) {
-        ret.frames[frame.id] = frame;
         const alias = map[frame.id];
 
         if (typeof alias !== 'undefined') ret[alias] = frame;

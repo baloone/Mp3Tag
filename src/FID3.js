@@ -26,13 +26,23 @@ require ('babel-polyfill');
             while (v3Ids.indexOf (id) > -1) {
                 const size = await (await fileReader.getPositiveNumber (4, 8));
                 const flags = await (await fileReader.getPositiveNumber (8, 10));
-
+                
                 frames.push (Frame (id, size, flags, await fileReader.slice (10)));
                 fileReader = await fileReader.slice (10 + size);
                 id = await (await fileReader.slice (0, 4)).toString ();
             }
+        } else {
+            let id = await (await fileReader.slice (0, 3)).toString ();
+
+            while (v2Ids.indexOf (id) > -1) {
+                const size = await (await fileReader.getPositiveNumber (3, 6));
+
+                frames.push (Frame (id, size, 0, await fileReader.slice (6)));
+                fileReader = await fileReader.slice (6 + size);
+                id = await (await fileReader.slice (0, 3)).toString ();
+            }
         }
-        return Tag(header, frames)
+        return Tag (header, frames);
     };
 
     global.FID3 = FID3;

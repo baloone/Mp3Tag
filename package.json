@@ -20,7 +20,7 @@
   },
   "scripts": {
     "gulp": "./node_modules/.bin/gulp ",
-    "gulp:watch": "./node_modules/.bin/gulp --watch",
+    "gulp:watch": "./node_modules/.bin/gulp watch",
     "lint": "./node_modules/.bin/eslint --ext .js src",
     "lint:fix": "./node_modules/.bin/eslint --ext .js src --fix"
   },

@@ -2,7 +2,8 @@ const reader = {
     async text (fileReader) {
         const encoding = await fileReader.getPositiveNumber (0);
 
-        return await (await fileReader.slice (1)).toString (encoding % 3 === 0);
+        console.log(encoding)
+        return await (await fileReader.slice (1, fileReader.length - (encoding%3 !== 0 ? 0 : 1))).toString (encoding%3 !== 0);
     },
     async url (fileReader) {
         return await fileReader.toString ();
@@ -17,7 +18,7 @@ const reader = {
         if (arr[off] === 0) off++;
         for (; arr[off] !== 0; off++);
         for (; arr[off] === 0; off++);
-        return (await fileReader.slice (off+1)).toBlob ();
+        return (await fileReader.slice (off + 1)).toBlob ();
     },
 };
 

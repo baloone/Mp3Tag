@@ -25,10 +25,13 @@ const Reader = async function(f) {
             if (a > b) return null;
             return await Reader (file.slice (a, b));
         },
+        get length() {
+            return file.size;
+        },
         async getPositiveNumber(a, b) {
             if (typeof a !== 'number')
                 throw new TypeError ('getPositiveNumber: Must be a number.');
-            if (typeof b !== 'number') b = a;
+            if (typeof b !== 'number') b = a + 1;
             if (a > b) return 0;
             let acc = 0;
             const slice = await (await this.slice (a, b)).toUint8Arr ();

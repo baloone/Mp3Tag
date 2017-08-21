@@ -65,22 +65,21 @@
     var time = document.querySelector ("#time")
     fileIn.addEventListener("change", function(e) {
             var file = e.target.files[0]
-            FID3(file).then(e=>console.log(e))
-            /*
-            var t1 = Date.now()
-            parser.read(function (dict) {
-                console.log (dict)
-                time.innerText = Date.now() - t1 + "ms"
-                album.innerText = !!dict.album ? dict.album.text : "Unknown album"
-                title.innerText = !!dict.title ? dict.title.text : "Unknown title"
-                year.innerText = !!dict.year ? dict.year.text : "Unknown year"
-                track.innerText = !!dict.track ? dict.track.text : "Unknown track"
-                genre.innerText = !!dict.genre ? dict.genre.text : "Unknown genre"
-                artist.innerText = !!dict.artist ? dict.artist.text : "Unknown artist"
-                img.src = !!dict.picture ? window.URL.createObjectURL(dict.picture.blob) : "1280x960.png"
-                audio.src = window.URL.createObjectURL(file)
+            var t1 = Date.now()            
+            FID3(file).then(tag => {
+                console.log(tag)
+                Promise.all(tag.frames.map(e => e.read())).then(r => {
+                    time.innerText = Date.now() - t1 + "ms"
+                    album.innerText = !!tag.album ? tag.album.value : "Unknown album"
+                    title.innerText = !!tag.title ? tag.title.value : "Unknown title"
+                    year.innerText = !!tag.year ? tag.year.value : "Unknown year"
+                    track.innerText = !!tag.track ? tag.track.value : "Unknown track"
+                    genre.innerText = !!tag.genre ? tag.genre.value : "Unknown genre"
+                    artist.innerText = !!tag.artist ? tag.artist.value : "Unknown artist"
+                    img.src = !!tag.picture ? window.URL.createObjectURL(tag.picture.value) : "1280x960.png"
+                    audio.src = window.URL.createObjectURL(file)
+                });
             })
-            */
         })
 </script>
 </html>
