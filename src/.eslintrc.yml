@@ -1,0 +1,67 @@
+env:
+  es6: true
+  node: true
+parser: babel-eslint
+parserOptions:
+  sourceType: module
+globals:
+  document: true
+  window: true
+rules:
+  indent: warn
+  quotes: [warn, single]
+  semi: [error, always]
+  no-compare-neg-zero: error
+  no-unreachable: error
+  use-isnan: warn
+  no-extra-boolean-cast: warn
+  no-unsafe-finally: error
+  valid-typeof: [error, requireStringLiterals: true]
+  valid-jsdoc: warn
+  accessor-pairs: [error, { setWithoutGet: true, getWithoutSet: false }]
+  consistent-return: [error, { treatUndefinedAsUnspecified: true }]
+  eqeqeq: error
+  camelcase: warn
+  dot-notation: warn
+  no-else-return: warn
+  no-void: error
+  no-with: error
+  require-await: warn
+  vars-on-top: warn
+  strict: [error, global]
+  yoda: [warn, never, { exceptRange: true }]
+  wrap-iife: [warn, outside]
+  no-use-before-define: error
+  no-undef-init: error
+  no-undef: error
+  array-bracket-spacing: [warn, always, { singleValue: false, objectsInArrays: false }]
+  block-spacing: [warn, always]
+  brace-style: warn
+  comma-dangle: [warn, { arrays: always-multiline, objects: always-multiline }]
+  comma-spacing: [warn, { before: false, after: true }]
+  comma-style: [warn, last]
+  eol-last: [error, always]
+  func-call-spacing: [warn, always]
+  func-names: [warn, never]
+  max-len: [warn, 120, { ignoreStrings: true }]
+  newline-after-var: [warn, always]
+  no-mixed-spaces-and-tabs: warn
+  no-multiple-empty-lines: warn
+  one-var-declaration-per-line: warn
+  one-var: [warn, never]
+  require-jsdoc: warn
+  spaced-comment: [warn, always]
+  no-const-assign: error
+  no-class-assign: error
+  no-var: error
+  no-useless-constructor: warn
+  prefer-arrow-callback: warn
+  prefer-const: warn
+  require-yield: error
+  no-empty-pattern: error
+  no-global-assign: error
+  no-loop-func: error
+  no-multi-spaces: warn
+  space-infix-ops: warn
+  keyword-spacing: warn
+  space-before-blocks: [warn, always]

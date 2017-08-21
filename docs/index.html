@@ -65,16 +65,8 @@
     var time = document.querySelector ("#time")
     fileIn.addEventListener("change", function(e) {
             var file = e.target.files[0]
-            var parser = new FID3(file, {
-                picture: true,
-                album: true,
-                artist: true,
-                title: true,
-                year: true,
-                genre: true,
-                track: true
-            })
-
+            FID3(file).then(e=>console.log(e))
+            /*
             var t1 = Date.now()
             parser.read(function (dict) {
                 console.log (dict)
@@ -88,6 +80,7 @@
                 img.src = !!dict.picture ? window.URL.createObjectURL(dict.picture.blob) : "1280x960.png"
                 audio.src = window.URL.createObjectURL(file)
             })
+            */
         })
 </script>
 </html>
