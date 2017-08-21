@@ -2,7 +2,6 @@ const reader = {
     async text (fileReader) {
         const encoding = await fileReader.getPositiveNumber (0);
 
-        console.log(encoding)
         return await (await fileReader.slice (1, fileReader.length - (encoding%3 !== 0 ? 0 : 1))).toString (encoding%3 !== 0);
     },
     async url (fileReader) {
