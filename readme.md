@@ -3,5 +3,5 @@
 ![Screenshot](img/screenshot.png)
 ## Usage:
 ```js
-var parser = new FID3(file|blob).then(tag => console.log(tag));
+var parser = FID3(file|blob).then(tag => console.log(tag));
 ```
