@@ -1,12 +1,7 @@
 /* global FileReader*/
-const Reader = async function(f) {
-    const file = await new Promise ((res, rej) => {
-        if (f.toString () === '[object File]' || f.toString () === '[object Blob]' || f.toString () === 'buffer') {
-            res (f);
-        } else {
-            throw rej ('Invalid file.');
-        }
-    });
+const Reader = function(file) {
+    if (['[object File]', '[object Blob]', 'buffer'].indexOf(file.toString ()) < 0)
+        throw new Error ('Invalid file.');
 
     const getBuffer = function() {
         return new Promise ( (res, rej) => {
@@ -19,11 +14,11 @@ const Reader = async function(f) {
     };
 
     return {
-        async slice(a, b = file.size) {
+        slice(a, b = file.size) {
             if (typeof a !== 'number' | typeof b !== 'number')
                 throw new TypeError ('slice: Must be a number.');
             if (a > b) return null;
-            return await Reader (file.slice (a, b));
+            return Reader (file.slice (a, b));
         },
         get length() {
             return file.size;

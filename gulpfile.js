@@ -1,20 +1,25 @@
 const gulp = require ('gulp');
 
 const browserify = require ('browserify');
-const babelify = require ('babelify');
 const source = require ('vinyl-source-stream');
 const buffer = require ('vinyl-buffer');
-const uglify = require ('gulp-uglify');
+const minify = require('gulp-minify');
 
 
 gulp.task ('build', () => {
     // app.js is your main JS file with all your module inclusions
-    return browserify ({entries: './src/FID3.js', debug: true})
-        .transform ('babelify', { presets: ['latest'] })
+    return browserify ({entries: './src/FID3.js', debug: false})
         .bundle ()
         .pipe (source ('FID3.min.js'))
         .pipe (buffer ())
-        .pipe (uglify ())
+        .pipe(minify({
+            ext:{
+                src:'-debug.js',
+                min:'.js'
+            },
+            exclude: ['tasks'],
+            ignoreFiles: ['.combo.js', '-min.js']
+        }))
         .pipe (gulp.dest ('./docs'));
 });
 
