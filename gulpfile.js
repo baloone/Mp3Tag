@@ -8,7 +8,7 @@ const minify = require('gulp-minify');
 
 gulp.task ('build', () => {
     // app.js is your main JS file with all your module inclusions
-    return browserify ({entries: './src/FID3.js', debug: false})
+    return browserify ({entries: './src/web.js', debug: false})
         .bundle ()
         .pipe (source ('FID3.min.js'))
         .pipe (buffer ())
