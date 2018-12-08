@@ -2,7 +2,7 @@
   "name": "fid3",
   "version": "0.1.0",
   "description": "A fast id3 tags reader written in js",
-  "main": "FID3.js",
+  "main": "src/FID3.js",
   "dependencies": {},
   "devDependencies": {
     "browserify": "^14.4.0",
