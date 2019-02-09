@@ -4,14 +4,7 @@
   "description": "A fast id3 tags reader written in js",
   "main": "src/FID3.js",
   "dependencies": {},
-  "devDependencies": {
-    "browserify": "^14.4.0",
-    "eslint": "^4.5.0",
-    "gulp": "^3.9.1",
-    "gulp-minify": "^2.1.0",
-    "vinyl-buffer": "^1.0.0",
-    "vinyl-source-stream": "^1.1.0"
-  },
+  "devDependencies": {},
   "scripts": {
     "gulp": "./node_modules/.bin/gulp ",
     "gulp:watch": "./node_modules/.bin/gulp watch",

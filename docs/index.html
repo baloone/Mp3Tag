@@ -38,8 +38,8 @@
                     <p class="subtitle is-6" id="year">Year</p>
                     <p class="subtitle is-6" style="margin-top: -1.5em" id="genre">Genre</p>
                 </div>
-                
             </div>
+            <div id="commentsDiv"></div>
             <footer class="card-footer">
                 <audio class="card-footer-item" controls style="width:100%" id="audio"></audio>
             </footer>
@@ -51,35 +51,32 @@
     <div id="div"></div>
     <img src="" >
 </body>
-<script src="FID3.min.js"></script>
+<script src="mp3tagreader.js"></script>
 <script>
-    var fileIn = document.querySelector ("#input")
-    var img = document.querySelector ("#img")
-    var artist = document.querySelector ("#artist")
-    var album = document.querySelector ("#album")
-    var title = document.querySelector ("#title")
-    var track = document.querySelector ("#track")
-    var genre = document.querySelector ("#genre")
-    var year = document.querySelector ("#year")
-    var audio = document.querySelector ("#audio")
-    var time = document.querySelector ("#time")
-    fileIn.addEventListener("change", function(e) {
-            var file = e.target.files[0]
-            var t1 = Date.now()            
-            FID3(file).then(tag => {
-                console.log(tag)
-                Promise.all(tag.frames.map(e => e.read())).then(r => {
-                    time.innerText = Date.now() - t1 + "ms"
-                    album.innerText = !!tag.album ? tag.album.value : "Unknown album"
-                    title.innerText = !!tag.title ? tag.title.value : "Unknown title"
-                    year.innerText = !!tag.year ? tag.year.value : "Unknown year"
-                    track.innerText = !!tag.track ? tag.track.value : "Unknown track"
-                    genre.innerText = !!tag.genre ? tag.genre.value : "Unknown genre"
-                    artist.innerText = !!tag.artist ? tag.artist.value : "Unknown artist"
-                    img.src = !!tag.picture ? window.URL.createObjectURL(tag.picture.value) : "1280x960.png"
-                    audio.src = window.URL.createObjectURL(file)
-                });
-            })
+    const fileIn = document.querySelector ("#input")
+    const img = document.querySelector ("#img")
+    const artist = document.querySelector ("#artist")
+    const album = document.querySelector ("#album")
+    const title = document.querySelector ("#title")
+    const track = document.querySelector ("#track")
+    const genre = document.querySelector ("#genre")
+    const year = document.querySelector ("#year")
+    const audio = document.querySelector ("#audio")
+    const time = document.querySelector ("#time")
+    fileIn.addEventListener("change", async function(e) {
+            const file = e.target.files[0];
+            const t1 = Date.now();
+            const tag = await decodeMp3Tag (file);
+            time.innerText = Date.now() - t1 + "ms"
+            album.innerText = !!tag.album ? tag.album : "Unknown album"
+            title.innerText = !!tag.title ? tag.title : "Unknown title"
+            year.innerText = !!tag.year ? tag.year : "Unknown year"
+            track.innerText = !!tag.track ? tag.track : "Unknown track"
+            genre.innerText = !!tag.genre ? tag.genre : "Unknown genre"
+            artist.innerText = !!tag.artist ? tag.artist : "Unknown artist"
+            img.src = !!tag.picture ? window.URL.createObjectURL(tag.picture) : "1280x960.png"
+            audio.src = window.URL.createObjectURL(file);
+            console.log (tag);
         })
 </script>
 </html>

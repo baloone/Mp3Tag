@@ -3,5 +3,8 @@
 ![Screenshot](img/screenshot.png)
 ## Usage:
 ```js
-var parser = FID3(file|blob).then(tag => console.log(tag));
+const tag = await decodeMp3Tag(file|blob);
+
+
+
 ```
