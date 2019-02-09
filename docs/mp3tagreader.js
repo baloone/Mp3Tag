@@ -87,7 +87,7 @@ const decodeMp3Tag = (function(){
             COMR: [],
             SIGN: [],
         };
-        const add = (i,v) => frames[i]==null?frames[i]=v:frames[i].push(v);
+        const add = (i,v) => !Array.isArray(frames[i])?frames[i]=v:frames[i].push(v);
         const text = data => {
             const [enc] = new Uint8Array (data.splice(0,1).buf);
             return bufferToString (data.buf, enc%3)
@@ -167,3 +167,4 @@ const decodeMp3Tag = (function(){
     return decodeMp3Tag;
 
 })();
+
