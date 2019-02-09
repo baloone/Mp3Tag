@@ -1,4 +1,4 @@
-const decodeMp3Tag = (function(){
+const getMp3Tag = (function(){
 
 
     const fileToArrayBuffer = function (blob) {
@@ -30,7 +30,7 @@ const decodeMp3Tag = (function(){
     
     
     
-    const decodeMp3Tag = async function (file) {
+    const getMp3Tag = async function (file) {
         if (file.type !== "audio/mpeg" && file.type !== "") return null;
         const id3v2Head = superBuffer (await fileToArrayBuffer (file.slice(0, 10)));
         const concatSize = (buf, i=8) => [...new Uint8Array (buf)].reduce ((prev, cur) =>(prev << i) + cur, 0);
@@ -164,7 +164,7 @@ const decodeMp3Tag = (function(){
         return ret;
     }
     
-    return decodeMp3Tag;
+    return getMp3Tag;
 
 })();
 

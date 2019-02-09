@@ -3,7 +3,7 @@
 ![Screenshot](img/screenshot.png)
 ## Usage:
 ```js
-const tag = await decodeMp3Tag(file|blob);
+const tag = await getMp3Tag(file|blob);
 
 
 
