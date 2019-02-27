@@ -42,7 +42,9 @@ const getMp3Tag = (function(){
             
             if (bufferToString(id3v1Tag.splice(0,3).buf) !== "TAG") return null;
             return {
-                id3Version: 1,
+                id3: {
+                    version: '1'
+                },
                 title: bufferToString (id3v1Tag.splice(0, 30).buf),
                 artist: bufferToString (id3v1Tag.splice(0, 30).buf),
                 year: bufferToString (id3v1Tag.splice(0, 4).buf),
@@ -52,7 +54,8 @@ const getMp3Tag = (function(){
         }
     
         const id3v2Version = [...new Uint8Array (id3v2Head.splice(0,2).buf)].join('.');
-        if (id3v2Version[0]-0 < 3) throw new Error('id3v2 2 not implemented yet');
+        const isv2_2 = id3v2Version[0]-0 < 3 ? 1 : 0;
+        //if (isv2_2) throw new Error('id3v2 2 not implemented yet');
         const [flags] = new Uint8Array (id3v2Head.splice(0,1).buf);
         if (flags & 0b1111) return null;
         const unsynchronisation = (flags & 0b10000000) !== 0;
@@ -68,7 +71,7 @@ const getMp3Tag = (function(){
             const extHeader = tag.splice(0, size); // TODO
         }
     
-        const frames = {
+        const frames = !isv2_2 ? {
             TXXX: [],
             WXXX: [],
             COMM: [],
@@ -86,6 +89,20 @@ const getMp3Tag = (function(){
             USER: [],
             COMR: [],
             SIGN: [],
+        } : {
+            COM: [],
+            UFI: [],
+            TXX: [],
+            WXX: [],
+            WAR: [],
+            WCM: [],
+            ULT: [],
+            SLT: [],
+            GEO: [],
+            POP: [],
+            CRM: [],
+            CRA: [],
+            LNK: [],
         };
         const add = (i,v) => !Array.isArray(frames[i])?frames[i]=v:frames[i].push(v);
         const text = data => {
@@ -94,14 +111,13 @@ const getMp3Tag = (function(){
         }
     
         while (1) {
-            const UframeId = new Uint8Array (tag.splice(0, 4).buf);
+            const UframeId = new Uint8Array (tag.splice(0, 4 - isv2_2).buf);
             const frameId = String.fromCodePoint(...UframeId);
             if (!UframeId[0]) break;
-            const size = concatSize (tag.splice(0,4).buf);
-            const [flags] = new Uint16Array (tag.splice(0,2).buf);
+            const size = concatSize (tag.splice(0,4 - isv2_2).buf);
+            const [flags] = new Uint16Array (tag.splice(0,2 - 2 * isv2_2).buf);
             const data = tag.splice(0,size);
-            console.log (frameId);
-            if (frameId === "UFID") {
+            if (frameId === "UFID" || frameId === "UFI") {
                 const arr = new Uint8Array (data.buf);
                 const i = arr.indexOf (0);
                 if ( i < 0 ) throw rej ('UFID');
@@ -111,30 +127,39 @@ const getMp3Tag = (function(){
                 });
             }
             else if (frameId[0] === "T") {
-                if (frameId === "TXXX") { 
+                if (frameId === "TXXX" || frameId === "TXX") { 
                     const [description, value] = text (data).split ("\u0000").filter (e => e!=="");
                     add (frameId, {description, value});
                 } else add (frameId,text (data));
             }
             else if (frameId[0] === "W") {
-                if (frameId === "WXXX") {
+                if (frameId === "WXXX" || frameId === "WXX") {
                     const [description, url] = text (data).split ("\u0000").filter (e => e!=="");
                     add (frameId, {description, url});
                 } else add (frameId, bufferToString (data.buf));
             }
-            else if (frameId  === "APIC") {
+            else if (frameId  === "APIC" || frameId  === "PIC") {
                 const [enc] = new Uint8Array (data.splice(0,1).buf);
                 const arr = new Uint8Array (data.buf);
                 let off = 0;
+                let prevoff = 0;
+                let type = "";
+                if (!isv2_2) {
+                    for (; arr[off] !== 0 && off < arr.length; off++);
+                    type = bufferToString (data.splice (0, isv2_2 ? ++off : off).buf, enc%3);
+                    prevoff = off++;off++;
+
+                } else {
+                    const imgType = bufferToString(data.splice (0, 3).buf);
+                    type = "image/"+imgType.toLowerCase();
+                    prevoff = off = 3;
+                }
                 for (; arr[off] !== 0 && off < arr.length; off++);
-                const type = bufferToString (data.splice (0, off).buf, enc%3);
-                let prevoff = off++;off++;
-                for (; arr[off] !== 0 && off < arr.length; off++);
-                for (; arr[off] === 0 && off < arr.length; off++); 
+                for (; arr[off] === 0 && off < arr.length; off++);
                 data.splice (0, off-prevoff);
                 add (frameId, new Blob ([data.buf], {type}));
             }
-            else if (frameId === "COMM") {
+            else if (frameId === "COMM" || frameId === "COM") {
                 const [enc] = new Uint8Array (data.splice(0,1).buf);
                 const language = bufferToString (data.splice(0,3).buf);
                 const arr = new Uint8Array (data.buf);
@@ -150,7 +175,10 @@ const getMp3Tag = (function(){
         }
     
         const ret = {
-            frames
+            frames,
+            id3: {
+                version: id3v2Version
+            }
         }
         if (ret.frames["TIT2"]!=null) ret.title = ret.frames["TIT2"];
         if (ret.frames["TPE1"]!=null) ret.artist = ret.frames["TPE1"];
@@ -160,6 +188,15 @@ const getMp3Tag = (function(){
         if (ret.frames["TRCK"]!=null) ret.genre = ret.frames["TRCK"];
         if (ret.frames["COMM"]!=null) ret.comments = ret.frames["COMM"].map(e=>e.comment);
         if (ret.frames["APIC"]!=null) ret.picture = ret.frames["APIC"];
+
+        if (ret.frames["TT2"]!=null) ret.title = ret.frames["TT2"];
+        if (ret.frames["TXT"]!=null) ret.artist = ret.frames["TXT"];
+        if (ret.frames["TYE"]!=null) ret.year = ret.frames["TYE"];
+        if (ret.frames["TAL"]!=null) ret.album = ret.frames["TAL"];
+        if (ret.frames["TCO"]!=null) ret.genre = ret.frames["TCO"];
+        if (ret.frames["TRK"]!=null) ret.genre = ret.frames["TRK"];
+        if (ret.frames["COM"]!=null) ret.comments = ret.frames["COM"].map(e=>e.comment);
+        if (ret.frames["PIC"]!=null) ret.picture = ret.frames["PIC"];
     
         return ret;
     }

@@ -1,0 +1,36 @@
+  4.19  AENC Audio encryption
+  4.30  ASPI Audio seek point index
+
+  4.24  COMR Commercial frame
+
+  4.25  ENCR Encryption method registration
+  4.12  EQU2 Equalisation (2)
+  4.5   ETCO Event timing codes
+
+  4.15  GEOB General encapsulated object
+  4.26  GRID Group identification registration
+
+  4.20  LINK Linked information
+
+  4.4   MCDI Music CD identifier
+  4.6   MLLT MPEG location lookup table
+
+  4.23  OWNE Ownership frame
+
+  4.27  PRIV Private frame
+  4.16  PCNT Play counter
+  4.17  POPM Popularimeter
+  4.21  POSS Position synchronisation frame
+
+  4.18  RBUF Recommended buffer size
+  4.11  RVA2 Relative volume adjustment (2)
+  4.13  RVRB Reverb
+
+  4.29  SEEK Seek frame
+  4.28  SIGN Signature frame
+  4.9   SYLT Synchronised lyric/text
+  4.7   SYTC Synchronised tempo codes
+
+
+  4.22  USER Terms of use
+  4.8   USLT Unsynchronised lyric/text transcription

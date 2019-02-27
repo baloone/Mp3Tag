@@ -1,4 +1,4 @@
-# Fast Id3 tag reader
+# Mp3TagReader
 ## Example:
 ![Screenshot](img/screenshot.png)
 ## Usage:
