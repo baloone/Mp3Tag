@@ -58,10 +58,10 @@ const getMp3Tag = (function(){
         //if (isv2_2) throw new Error('id3v2 2 not implemented yet');
         const [flags] = new Uint8Array (id3v2Head.splice(0,1).buf);
         if (flags & 0b1111) return null;
-        const unsynchronisation = (flags & 0b10000000) !== 0;
-        const extendedHeader = (flags & 0b01000000) !== 0;
+        const unsynchronisation     = (flags & 0b10000000) !== 0;
+        const extendedHeader        = (flags & 0b01000000) !== 0;
         const experimentalIndicator = (flags & 0b00100000) !== 0;
-        const FooterPresent = (flags & 0b00010000) !== 0;
+        const FooterPresent         = (flags & 0b00010000) !== 0;
         const size = concatSize (id3v2Head.splice(0,4).buf);
         const tag = superBuffer (await fileToArrayBuffer (file.slice(10).slice(0, size)));
         
@@ -177,7 +177,11 @@ const getMp3Tag = (function(){
         const ret = {
             frames,
             id3: {
-                version: id3v2Version
+                version: id3v2Version,
+                unsynchronisation,
+                extendedHeader,
+                experimentalIndicator,
+                FooterPresent
             }
         }
         if (ret.frames["TIT2"]!=null) ret.title = ret.frames["TIT2"];
