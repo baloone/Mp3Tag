@@ -185,16 +185,16 @@ const getMp3Tag = (function(){
         if (ret.frames["TYER"]!=null) ret.year = ret.frames["TYER"];
         if (ret.frames["TALB"]!=null) ret.album = ret.frames["TALB"];
         if (ret.frames["TCON"]!=null) ret.genre = ret.frames["TCON"];
-        if (ret.frames["TRCK"]!=null) ret.genre = ret.frames["TRCK"];
+        if (ret.frames["TRCK"]!=null) ret.track = ret.frames["TRCK"];
         if (ret.frames["COMM"]!=null) ret.comments = ret.frames["COMM"].map(e=>e.comment);
         if (ret.frames["APIC"]!=null) ret.picture = ret.frames["APIC"];
 
         if (ret.frames["TT2"]!=null) ret.title = ret.frames["TT2"];
-        if (ret.frames["TXT"]!=null) ret.artist = ret.frames["TXT"];
+        if (ret.frames["TP1"]!=null) ret.artist = ret.frames["TP1"];
         if (ret.frames["TYE"]!=null) ret.year = ret.frames["TYE"];
         if (ret.frames["TAL"]!=null) ret.album = ret.frames["TAL"];
         if (ret.frames["TCO"]!=null) ret.genre = ret.frames["TCO"];
-        if (ret.frames["TRK"]!=null) ret.genre = ret.frames["TRK"];
+        if (ret.frames["TRK"]!=null) ret.track = ret.frames["TRK"];
         if (ret.frames["COM"]!=null) ret.comments = ret.frames["COM"].map(e=>e.comment);
         if (ret.frames["PIC"]!=null) ret.picture = ret.frames["PIC"];
     
