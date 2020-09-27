@@ -68,12 +68,12 @@
             const t1 = Date.now();
             const tag = await getMp3Tag (file);
             time.innerText = Date.now() - t1 + "ms"
-            album.innerText = !!tag.album ? tag.album : "Unknown album"
-            title.innerText = !!tag.title ? tag.title : "Unknown title"
-            year.innerText = !!tag.year ? tag.year : "Unknown year"
-            track.innerText = !!tag.track ? tag.track : "Unknown track"
-            genre.innerText = !!tag.genre ? tag.genre : "Unknown genre"
-            artist.innerText = !!tag.artist ? tag.artist : "Unknown artist"
+            album.innerText = !!tag.album ? tag.album : ""
+            title.innerText = !!tag.title ? tag.title : ""
+            year.innerText = !!tag.year ? tag.year : ""
+            track.innerText = !!tag.track ? tag.track : ""
+            genre.innerText = !!tag.genre ? tag.genre : ""
+            artist.innerText = !!tag.artist ? tag.artist : ""
             img.src = !!tag.picture ? window.URL.createObjectURL(tag.picture) : "1280x960.png"
             audio.src = window.URL.createObjectURL(file);
             console.log (tag);
