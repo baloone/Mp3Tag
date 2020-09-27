@@ -30,7 +30,7 @@ const getMp3Tag = (function(){
         });
     };
     
-    const bufferToString = (buf, u16=false) => String.fromCodePoint(...new (u16?Uint16Array:Uint8Array)(buf));
+    const bufferToString = (buf, u16=false) => String.fromCodePoint(...new (u16?Uint16Array:Uint8Array)(buf)).split('\0').join();
     
     const superBuffer = buf => {
         return {
