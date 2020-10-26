@@ -15,6 +15,21 @@
 
 const getMp3Tag = (function(){
 
+    const strOfBuffer = (buf, base2 = false) => (base2?"0b_":"0x_")+[...new Uint8Array(buf)].map(e=>e.toString(16-14*base2).padStart(2+6*base2, '0')).join('_');
+
+    const bitsofByte = function(x, scheme, map={}) {
+        const ret = {};
+        if (scheme.length !== 8) throw new Error("bitsofByte");
+        for(let i = 0, y = 1 << 7; i < 8; i++, y >>= 1 ) {
+            if (scheme[i] === "0" && x & y) throw new Error("bitsofByte"); 
+            if (scheme[i] === "1" && !(x & y)) throw new Error("bitsofByte");
+            if (["0", "1", "*"].includes(scheme[i])) continue;
+            const index = map[scheme[i]] != null ? map[scheme[i]] : scheme[i];
+            const bit = !!(x & y) * 1;
+            ret[index] = ret[index] == null ? bit : ret[index] * 2 + bit;
+        }
+        return ret
+    }
 
     const fileToArrayBuffer = function (blob) {
         return new Promise ((res, rej) => {
@@ -73,17 +88,92 @@ const getMp3Tag = (function(){
         //if (isv2_2) throw new Error('id3v2 2 not implemented yet');
         const [flags] = new Uint8Array (id3v2Head.splice(0,1).buf);
         if (flags & 0b1111) return null;
-        const unsynchronisation     = (flags & 0b10000000) !== 0;
-        const extendedHeader        = (flags & 0b01000000) !== 0;
-        const experimentalIndicator = (flags & 0b00100000) !== 0;
-        const FooterPresent         = (flags & 0b00010000) !== 0;
+        const {
+            unsynchronisation,
+            extendedHeader_b,
+            experimentalIndicator,
+            footerPresent
+        } = bitsofByte(flags, "abcd0000", {
+            a: "unsynchronisation",
+            b: "extendedHeader_b",
+            c: "experimentalIndicator",
+            d: "footerPresent"
+        });
+        
         const size = concatSize (id3v2Head.splice(0,4).buf);
         const tag = superBuffer (await fileToArrayBuffer (file.slice(10).slice(0, size)));
+        const extendedHeader = extendedHeader_b ? {} : null;
         
     
-        if (extendedHeader) {
-            const [size] = new Uint32Array (tag.splice(0, 4).buf);
-            const extHeader = tag.splice(0, size); // TODO
+        if (extendedHeader_b) {
+            const a = tag.splice(0, 4).buf;
+            if ((new Uint8Array(a)).some(x => x & 0b10000000))
+                throw new Error("Error while getting the size of the extended header.");
+            const size = concatSize(a, 7);
+            const extHeader = tag.splice(0, size); 
+            const extendedFlags = new Uint8Array(extHeader.splice(0, 2).buf);
+            if (id3v2Version[0] === "4") {
+                if (extendedFlags[0] !== 0x00000001)
+                    throw new Error("Error while reading the extended header.");
+                const {b, c, d} = bitsofByte(extendedFlags[1], "0bcd0000");
+                if (b) extHeader.splice(0, 1);
+                if (c) extendedHeader.crcData = extHeader.splice(1, 6).buf;
+                if (d) {
+                    const {p, q, r, s, t} = bitsofByte(new Uint8Array(extHeader.splice(1, 2).buf)[0], "ppqrrstt");
+                    const pverb = [
+                        "No more than 128 frames and 1 MB total tag size.",
+                        "No more than 64 frames and 128 KB total tag size.",
+                        "No more than 32 frames and 40 KB total tag size.",
+                        "No more than 32 frames and 4 KB total tag size."
+                    ];
+                    const qverb = [
+                        "No restrictions",
+                        "Strings are only encoded with ISO-8859-1 [ISO-8859-1] or UTF-8 [UTF-8]."
+                    ];
+                    const rverb = [
+                        "No restrictions",
+                        "No string is longer than 1024 characters.",
+                        "No string is longer than 128 characters.",
+                        "No string is longer than 30 characters."
+                    ];
+                    const sverb = [
+                        "No restrictions",
+                        "Images are encoded only with PNG [PNG] or JPEG [JFIF]."
+                    ];
+                    const tverb = [
+                        "No restrictions",
+                        "All images are 256x256 pixels or smaller.",
+                        "All images are 64x64 pixels or smaller.",
+                        "All images are exactly 64x64 pixels, unless required otherwise."
+                    ];
+                    extendedHeader.restrictions = {
+                        tagSize: p,
+                        textEncoding: q,
+                        textFieldsSize: r,
+                        imageEncoding: s,
+                        imageSize: t,
+                        verbose: {
+                            tagSize: pverb[p],
+                            textEncoding: qverb[q],
+                            textFieldsSize: rverb[r],
+                            imageEncoding: sverb[s],
+                            imageSize: tverb[t],
+                        }
+                    };
+
+                }
+                extendedHeader.flags = {isAnUpdate: b, crc: c, restrictions: d};
+            } else {
+                const {x} = bitsofByte(extendedFlags[0], "x0000000");
+                if (extendedFlags[1] !== 0)
+                    throw new Error("Error while reading the extended header.");
+                extendedHeader.flags = {crc: x};
+                const size = concatSize(extHeader.splice(0, 4).buf);
+                if (x) {
+                    extendedHeader.crcData = extHeader.splice(0, 4).buf;
+                }
+            }
+
         }
     
         const frames = !isv2_2 ? {
@@ -196,7 +286,7 @@ const getMp3Tag = (function(){
                 unsynchronisation,
                 extendedHeader,
                 experimentalIndicator,
-                FooterPresent
+                footerPresent
             }
         }
         if (ret.frames["TIT2"]!=null) ret.title = ret.frames["TIT2"];
