@@ -44,15 +44,19 @@ const getMp3Tag = (function(){
             reader.readAsArrayBuffer(blob);
         });
     };
-    
-    const bufferToString = (buf, u16=false) => String.fromCodePoint(...new (u16?Uint16Array:Uint8Array)(buf)).split('\0').join();
-    
+
+    const bufferToString = (buf, u16=false) => String.fromCodePoint(...new (u16?Uint16Array:Uint8Array)(buf));
+
     const superBuffer = buf => {
         return {
             get buf () {return buf;},
             splice (a, b) {
                 const tmp = buf.slice (a,b);
                 buf = buf.slice (b)
+                return superBuffer (tmp)
+            },
+            slice (a, b) {
+                const tmp = buf.slice (a,b);
                 return superBuffer (tmp)
             }
         };
@@ -63,7 +67,7 @@ const getMp3Tag = (function(){
     const getMp3Tag = async function (file) {
         if (file.type !== "audio/mpeg" && file.type !== "") return null;
         const id3v2Head = superBuffer (await fileToArrayBuffer (file.slice(0, 10)));
-        const concatSize = (buf, i=8) => [...new Uint8Array (buf)].reduce ((prev, cur) =>(prev << i) + cur, 0);
+        const concatSize = (buf, i=8) => [...new Uint8Array (buf)].reduce ((prev, cur) =>(prev << i) + cur);
         const id3v1Genre = ["Blues","Classic Rock","Country","Dance","Disco","Funk","Grunge","Hip-Hop","Jazz","Metal","New Age","Oldies","Other","Pop","R&B","Rap","Reggae","Rock","Techno","Industrial","Alternative","Ska","Death Metal","Pranks","Soundtrack","Euro-Techno","Ambient","Trip-Hop","Vocal","Jazz+Funk","Fusion","Trance","Classical","Instrumental","Acid","House","Game","Sound Clip","Gospel","Noise","AlternRock","Bass","Soul","Punk","Space","Meditative","Instrumental Pop","Instrumental Rock","Ethnic","Gothic","Darkwave","Techno-Industrial","Electronic","Pop-Folk","Eurodance","Dream","Southern Rock","Comedy","Cult","Gangsta","Top 40","Christian Rap","Pop/Funk","Jungle","Native American","Cabaret","New Wave","Psychedelic","Rave","Showtunes","Trailer","Lo-Fi","Tribal","Acid Punk","Acid Jazz","Polka","Retro","Musical","Rock & Roll","Hard Rock"];
     
     
@@ -85,7 +89,6 @@ const getMp3Tag = (function(){
     
         const id3v2Version = [...new Uint8Array (id3v2Head.splice(0,2).buf)].join('.');
         const isv2_2 = id3v2Version[0]-0 < 3 ? 1 : 0;
-        //if (isv2_2) throw new Error('id3v2 2 not implemented yet');
         const [flags] = new Uint8Array (id3v2Head.splice(0,1).buf);
         if (flags & 0b1111) return null;
         const {
@@ -99,18 +102,18 @@ const getMp3Tag = (function(){
             c: "experimentalIndicator",
             d: "footerPresent"
         });
-        
+
         const size = concatSize (id3v2Head.splice(0,4).buf);
         const tag = superBuffer (await fileToArrayBuffer (file.slice(10).slice(0, size)));
         const extendedHeader = extendedHeader_b ? {} : null;
-        
+
     
         if (extendedHeader_b) {
             const a = tag.splice(0, 4).buf;
             if ((new Uint8Array(a)).some(x => x & 0b10000000))
                 throw new Error("Error while getting the size of the extended header.");
             const size = concatSize(a, 7);
-            const extHeader = tag.splice(0, size); 
+            const extHeader = tag.splice(0, size);
             const extendedFlags = new Uint8Array(extHeader.splice(0, 2).buf);
             if (id3v2Version[0] === "4") {
                 if (extendedFlags[0] !== 0x00000001)
@@ -212,14 +215,15 @@ const getMp3Tag = (function(){
         const add = (i,v) => !Array.isArray(frames[i])?frames[i]=v:frames[i].push(v);
         const text = data => {
             const [enc] = new Uint8Array (data.splice(0,1).buf);
-            return bufferToString (data.buf, enc%3)
+            const t = bufferToString (data.buf, enc%3);
+            return t.split(/[\u0000]+/).join(' ').trim()
         }
-    
+
         while (1) {
             const UframeId = new Uint8Array (tag.splice(0, 4 - isv2_2).buf);
             const frameId = String.fromCodePoint(...UframeId);
             if (!UframeId[0]) break;
-            const size = concatSize (tag.splice(0,4 - isv2_2).buf);
+            const size = concatSize(tag.splice(0, 4 - isv2_2).buf, (7+ (id3v2Version[0]!=4)))
             const [flags] = new Uint16Array (tag.splice(0,2 - 2 * isv2_2).buf);
             const data = tag.splice(0,size);
             if (frameId === "UFID" || frameId === "UFI") {
@@ -227,7 +231,7 @@ const getMp3Tag = (function(){
                 const i = arr.indexOf (0);
                 if ( i < 0 ) throw rej ('UFID');
                 add (frameId, {
-                    ownerIdentifier: String.fromCharPoint(...arr.slice(0,i)),
+                    ownerIdentifier: String.fromCodePoint(...arr.slice(0,i)),
                     identifier: arr.slice (i+1)
                 });
             }
@@ -251,17 +255,17 @@ const getMp3Tag = (function(){
                 let type = "";
                 if (!isv2_2) {
                     for (; arr[off] !== 0 && off < arr.length; off++);
-                    type = bufferToString (data.splice (0, isv2_2 ? ++off : off).buf, enc%3);
+                    type = bufferToString (data.slice (0, isv2_2 ? ++off : off).buf, enc%3);
                     prevoff = off++;off++;
 
                 } else {
-                    const imgType = bufferToString(data.splice (0, 3).buf);
+                    const imgType = bufferToString(data.slice (off, off+3).buf);
                     type = "image/"+imgType.toLowerCase();
                     prevoff = off = 3;
                 }
                 for (; arr[off] !== 0 && off < arr.length; off++);
                 for (; arr[off] === 0 && off < arr.length; off++);
-                data.splice (0, off-prevoff);
+                data.splice (0, off);
                 add (frameId, new Blob ([data.buf], {type}));
             }
             else if (frameId === "COMM" || frameId === "COM") {
